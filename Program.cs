@@ -7,6 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace BenchmarkingExcelPackages
 {
@@ -15,21 +18,25 @@ namespace BenchmarkingExcelPackages
         static async Task Main()
         {
             //EPPlus
-            var EPPlus = new EPPlus();
-            await EPPlus.ReadDataAsync();
-            await EPPlus.WriteDataAsync();
-            Console.WriteLine("EPPlus Read/Write complete...");
+            //var EPPlus = new EPPlus();
+            //await EPPlus.ReadDataAsync();
+            //await EPPlus.WriteDataAsync();
+            //Console.WriteLine("EPPlus Read/Write complete...");
 
             //NPOI
 
             //ExcelDataReader
 
+            var ExcelDR = new ExcelDataReader();
+            ExcelDR.ReadDataFromFile();
+            Console.WriteLine("ExcelDataRead read data");
+            ExcelDR.WriteDataToFile();
 
             //BenchmarkDotNet
 
-#if (!Debug)
-            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
-#endif
+//#if (!Debug)
+//            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+//#endif
 
             return;
         }
