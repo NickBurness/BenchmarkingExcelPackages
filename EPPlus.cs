@@ -106,11 +106,23 @@ namespace BenchmarkingExcelPackages
                         //loop all cells in the row
                         foreach (var cell in row)
                         {
-                            newRow[cell.Start.Column - 1] = cell.Text;
+                            newRow[cell.Start.Column - 1] = cell.Value;
                         }
                         dataTable.Rows.Add(newRow);
                     }
-                    return dataTable;
+
+                    // clone it and update this one with its data types
+                    DataTable finalDataTable = dataTable.Clone();
+                    finalDataTable.Columns[0].DataType = typeof(int);
+                    finalDataTable.Columns[2].DataType = typeof(bool);
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        finalDataTable.ImportRow(row);
+
+                    }
+
+                    return finalDataTable;
                 }
             }
         }
@@ -132,6 +144,11 @@ namespace BenchmarkingExcelPackages
 
                     // add all the data to the excel sheet, starting at cell A1 including headers
                     worksheet.Cells["A1"].LoadFromDataTable(data, true);
+
+                    if (worksheet.Cells[2, 3, worksheet.Dimension.End.Row, 3].Value.ToString() == "1")
+                    {
+                        worksheet.Cells.Value = "true";
+                    }
 
                     // 1.4, 1.5 get a range of cells
                     var rangeOfCells = worksheet.Cells[2, 6, worksheet.Dimension.End.Row, 6];
@@ -170,7 +187,7 @@ namespace BenchmarkingExcelPackages
                     string path = "";
                     string actualPath = path.SetDirectoryPath();
 
-                    FileInfo fileInfo = new FileInfo(@$"{actualPath}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
+                    FileInfo fileInfo = new FileInfo($@"{actualPath}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
                     excelPackage.SaveAs(fileInfo);
 
                     return true;
