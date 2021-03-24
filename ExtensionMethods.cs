@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace BenchmarkingExcelPackages
 {
@@ -15,6 +16,14 @@ namespace BenchmarkingExcelPackages
             string dir = Directory.GetParent(parentDir).ToString();
 
             return dir;
+        }
+
+        public static string GetLowDetailAboutMemoryUsage(this string method)
+        {
+            var megabytesOfMemory = (GC.GetTotalMemory(false) / 1000000);
+            var stringified = megabytesOfMemory.ToString();
+            var result = $"{stringified} megabytes of data thought to be currently allocated to memory";
+            return result;
         }
     }
 }
