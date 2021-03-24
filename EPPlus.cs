@@ -7,7 +7,6 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BenchmarkingExcelPackages
@@ -15,22 +14,6 @@ namespace BenchmarkingExcelPackages
     [MemoryDiagnoser]
     public class EPPlus
     {
-        /// <summary>
-        /// Sets the directory to the /BenchmarkingExcelPackages instead of /BenchmarkingExcelPackages/bin/Release or /bin/Debug
-        /// </summary>
-        public string SetDirectoryPath()
-        {
-            // based on execution context...
-            //starting would be either /bin/debug or /bin/release
-            string initialDir = Directory.GetCurrentDirectory();
-            // so go up one level to /bin
-            string parentDir = Directory.GetParent(initialDir).ToString();
-            // and up another to /BenchmarkingExcelPackages
-            string dir = Directory.GetParent(parentDir).ToString();
-
-            return dir;
-        }
-
         /// <summary>
         /// Implements the ReadData() method as an asynchronous task
         /// </summary>
@@ -59,9 +42,10 @@ namespace BenchmarkingExcelPackages
         [Benchmark]
         public DataTable ReadData()
         {
-            var targetDir = SetDirectoryPath();
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
 
-            byte[] file = File.ReadAllBytes($"{targetDir}\\ExcelFiles\\SampleData.xlsx");
+            byte[] file = File.ReadAllBytes($@"{actualPath}\ExcelFiles\SampleData.xlsx");
 
             var dataTable = new DataTable("Data");
 
@@ -183,9 +167,10 @@ namespace BenchmarkingExcelPackages
                     specificCell.Style.Border.Left.Style = ExcelBorderStyle.Double;
 
 
-                    var targetDir = SetDirectoryPath();
+                    string path = "";
+                    string actualPath = path.SetDirectoryPath();
 
-                    FileInfo fileInfo = new FileInfo($"{targetDir}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
+                    FileInfo fileInfo = new FileInfo(@$"{actualPath}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
                     excelPackage.SaveAs(fileInfo);
 
                     return true;

@@ -267,6 +267,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EPPlus.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Models\ExcelData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
