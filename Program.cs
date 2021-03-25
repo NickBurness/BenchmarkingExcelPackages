@@ -2,9 +2,6 @@
 using System.Threading.Tasks;
 using System.Diagnostics;
 using static System.Console;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace BenchmarkingExcelPackages
 {
@@ -37,12 +34,13 @@ namespace BenchmarkingExcelPackages
             //NPOI
 
             //ExcelDataReader
-
             var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
+
             ExcelDR.ReadDataFromFile();
-            Console.WriteLine("ExcelDataRead read data");
+            WriteLine("ExcelDataRead read data");
+
             ExcelDR.WriteDataToFile();
-            Console.WriteLine("ClosedXML written data");
+            WriteLine("ClosedXML written data");
 
             //BenchmarkDotNet
 #if (!Debug)

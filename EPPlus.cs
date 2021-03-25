@@ -147,7 +147,6 @@ namespace BenchmarkingExcelPackages
 
                     // add all the data to the excel sheet, starting at cell A1 including headers
                     worksheet.Cells["A1"].LoadFromDataTable(data, true);
-                    worksheet2.Cells["A1"].LoadFromDataTable(data)
 
                     worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
@@ -196,7 +195,7 @@ namespace BenchmarkingExcelPackages
                     string path = "";
                     string actualPath = path.SetDirectoryPath();
 
-                    FileInfo fileInfo = new FileInfo($@"{actualPath}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
+                    FileInfo fileInfo = new FileInfo($@"{actualPath}\ExcelFiles\EPPlusGeneratedFile.xlsx");
                     excelPackage.SaveAs(fileInfo);
 
                     return true;

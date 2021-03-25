@@ -13,7 +13,10 @@ namespace BenchmarkingExcelPackages
         public DataTable ReadDataFromFile()
 
         {
-            var filePath = @"C:\Users\FKANE\source\repos\ExcelPackages\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx";
+            string path = "";
+            string filePath = path.SetDirectoryPath();
+
+            filePath = $@"{filePath}\ExcelFiles\SampleData.xlsx";
 
             using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
             {
@@ -93,8 +96,6 @@ namespace BenchmarkingExcelPackages
 
         {
 
-            String newlyCreatedFilePath = @"C:\Users\FKANE\source\repos\ExcelPackages\BenchmarkingExcelPackages\ExcelFiles\WriteToFile.xlsx";
-
             var wb = new XLWorkbook();
             IXLWorksheet ws = wb.Worksheets.Add("Primary", 1);
             IXLWorksheet ws2 = wb.Worksheets.Add("Secondary", 2);
@@ -144,6 +145,10 @@ namespace BenchmarkingExcelPackages
 
             //        IXLRange range = ws.Range(ws.Cell(1, 1).Address, ws.Cell(100001, 5).Address);
             //        range.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
+
+            string path = "";
+            string filePath = path.SetDirectoryPath();
+            string newlyCreatedFilePath = $@"{filePath}\ExcelFiles\ExcelDataReader_ClosedXMLGeneratedFile.xlsx";
 
             wb.SaveAs(newlyCreatedFilePath);
         }
