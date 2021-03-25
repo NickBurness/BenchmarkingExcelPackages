@@ -18,10 +18,10 @@ namespace BenchmarkingExcelPackages
         static async Task Main()
         {
             //EPPlus
-            //var EPPlus = new EPPlus();
-            //await EPPlus.ReadDataAsync();
-            //await EPPlus.WriteDataAsync();
-            //Console.WriteLine("EPPlus Read/Write complete...");
+            var EPPlus = new EPPlus();
+            await EPPlus.ReadDataAsync();
+            await EPPlus.WriteDataAsync();
+            Console.WriteLine("EPPlus Read/Write complete...");
 
             //NPOI
 
@@ -31,12 +31,13 @@ namespace BenchmarkingExcelPackages
             ExcelDR.ReadDataFromFile();
             Console.WriteLine("ExcelDataRead read data");
             ExcelDR.WriteDataToFile();
+            Console.WriteLine("ClosedXML written data");
 
             //BenchmarkDotNet
 
-//#if (!Debug)
-//            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
-//#endif
+#if (!Debug)
+            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+#endif
 
             return;
         }

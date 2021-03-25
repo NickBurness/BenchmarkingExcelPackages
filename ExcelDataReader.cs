@@ -67,7 +67,7 @@ namespace BenchmarkingExcelPackages
                     return resultTable;
 
                     // Attempt to get second sheet
-                  
+
 
                 }
             }
@@ -89,6 +89,8 @@ namespace BenchmarkingExcelPackages
         //            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         //        }
         //    }
+
+        [Benchmark]
         public void WriteDataToFile()
 
         {
