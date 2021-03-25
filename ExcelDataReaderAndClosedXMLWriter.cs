@@ -7,14 +7,13 @@ using ClosedXML.Excel;
 
 namespace BenchmarkingExcelPackages
 {
-    public class ExcelDataReader
+    public class ExcelDataReaderAndClosedXMLWriter
     {
-        //[Benchmark]
+        [Benchmark]
         public DataTable ReadDataFromFile()
 
         {
             var filePath = @"C:\Users\FKANE\source\repos\ExcelPackages\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx";
-            //var dataTableCollection = new DataTableCollection;
 
             using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
             {
@@ -63,11 +62,10 @@ namespace BenchmarkingExcelPackages
                     });
                     Console.WriteLine("table read and configured");
                     DataTableCollection resultFromSpreadsheet = result.Tables;
+
+                    // Returns sheet 1 only
                     DataTable resultTable = resultFromSpreadsheet[0];
                     return resultTable;
-
-                    // Attempt to get second sheet
-
 
                 }
             }
@@ -145,10 +143,7 @@ namespace BenchmarkingExcelPackages
 
 
             //        IXLRange range = ws.Range(ws.Cell(1, 1).Address, ws.Cell(100001, 5).Address);
-
             //        range.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
-
-
 
             wb.SaveAs(newlyCreatedFilePath);
         }

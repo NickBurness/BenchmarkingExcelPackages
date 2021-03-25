@@ -41,7 +41,7 @@ namespace BenchmarkingExcelPackages
 
             //ExcelDataReader
 
-            var ExcelDR = new ExcelDataReader();
+            var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
             ExcelDR.ReadDataFromFile();
             Console.WriteLine("ExcelDataRead read data");
             ExcelDR.WriteDataToFile();
