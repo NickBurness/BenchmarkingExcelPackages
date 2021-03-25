@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace BenchmarkingExcelPackages
 {
+    [EpplusTable()]
     public class ExcelData
     {
         public ExcelData()

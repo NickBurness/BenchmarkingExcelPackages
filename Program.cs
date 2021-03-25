@@ -30,7 +30,9 @@ namespace BenchmarkingExcelPackages
 
 
             //BenchmarkDotNet
+#if (!Debug)
             var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+#endif
             return;
         }
     }
