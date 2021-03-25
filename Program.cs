@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using static System.Console;
 
 namespace BenchmarkingExcelPackages
 {
@@ -9,30 +9,27 @@ namespace BenchmarkingExcelPackages
     {
         static async Task Main()
         {
-            string memoryUsage = "";
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-
-            // set up a stopwatch
+            var memoryUsage = "";
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
             var watch = Stopwatch.StartNew();
 
             //EPPlus
             var EPPlus = new EPPlus();
-
-
-            watch.Start();
-            Console.WriteLine("EPPlus Processes Started...");
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine("Read Method Started...");
+            WriteLine("EPPlus Processes Started...");
+            
+            WriteLine("Read Method Started...");
             await EPPlus.ReadDataAsync();
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine("Write Method Started...");
-            await EPPlus.WriteDataAsync();
-            Console.WriteLine("Write Method Complete...");
-            watch.Stop();
-            Console.WriteLine("EPPlus Read/Write Complete...");
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.ElapsedMilliseconds / 1000} seconds");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
 
+            WriteLine("Write Method Started...");
+            await EPPlus.WriteDataAsync();
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+            WriteLine("Write Method Complete...");
+
+            watch.Stop();
+
+            WriteLine("EPPlus Processes Complete...");
+            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
 
             //NPOI
 
