@@ -48,10 +48,10 @@ namespace BenchmarkingExcelPackages
             Console.WriteLine("ClosedXML written data");
 
             //BenchmarkDotNet
-#if (!Debug)
-            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
-#endif
-            return;
+//#if (!Debug)
+//            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+//#endif
+//            return;
         }
     }
 }

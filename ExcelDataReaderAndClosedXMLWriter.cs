@@ -30,26 +30,27 @@ namespace BenchmarkingExcelPackages
                         ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
                         {
                             // Gets or sets a value indicating the prefix of generated column names.
-                            EmptyColumnNamePrefix = "Column",
+                            //EmptyColumnNamePrefix = "Column",
 
-                            // Gets or sets a value indicating whether to use a row from the 
-                            // data as column names.
-                            UseHeaderRow = true,
+
+                    // Gets or sets a value indicating whether to use a row from the 
+                    // data as column names.
+                    UseHeaderRow = true,
 
                             // Gets or sets a callback to determine which row is the header row. 
                             // Only called when UseHeaderRow = true.
                             //ReadHeaderRow = (rowReader) =>
                             //{
                             //    // F.ex skip the first row and use the 2nd row as column headers:
-                            //    rowReader.read();
+                            //    rowReader.Read();
                             //},
 
                             // Gets or sets a callback to determine whether to include the 
                             // current row in the DataTable.
-                            FilterRow = (rowReader) =>
-                            {
-                                return true;
-                            },
+                            //FilterRow = (rowReader) =>
+                            //{
+                            //    return true;
+                            //},
 
                             // Gets or sets a callback to determine whether to include the specific
                             // column in the DataTable. Called once per column after reading the 
