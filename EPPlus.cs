@@ -7,7 +7,6 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BenchmarkingExcelPackages
@@ -15,6 +14,9 @@ namespace BenchmarkingExcelPackages
     [MemoryDiagnoser]
     public class EPPlus
     {
+        /// <summary>
+        /// Implements the ReadData() method as an asynchronous task
+        /// </summary>
         [Benchmark]
         public async Task<DataTable> ReadDataAsync()
         {
@@ -23,17 +25,27 @@ namespace BenchmarkingExcelPackages
             return result;
         }
 
+        /// <summary>
+        /// Implements the WriteData() method as an asynchronous task
+        /// </summary>
+        [Benchmark]
+        public async Task<bool> WriteDataAsync()
+        {
+            var task = Task.Run(() => WriteData());
+            var result = await task;
+            return result;
+        }
+
+        /// <summary>
+        /// Reads cell data from .xlsx file in the specified directory
+        /// </summary>
         [Benchmark]
         public DataTable ReadData()
-        {   
-            // starting would be either /bin/debug or /bin/release...
-            string initialDir = Directory.GetCurrentDirectory();
-            // so go up one level to /bin
-            string parentDir = Directory.GetParent(initialDir).ToString();
-            // and up another to /BenchmarkingExcelPackages
-            string targetDir = Directory.GetParent(parentDir).ToString();
+        {
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
 
-            byte[] file = File.ReadAllBytes($"{targetDir}\\ExcelFiles\\SampleData.xlsx");
+            byte[] file = File.ReadAllBytes($@"{actualPath}\ExcelFiles\SampleData.xlsx");
 
             var dataTable = new DataTable("Data");
 
@@ -94,23 +106,30 @@ namespace BenchmarkingExcelPackages
                         //loop all cells in the row
                         foreach (var cell in row)
                         {
-                            newRow[cell.Start.Column - 1] = cell.Text;
+                            newRow[cell.Start.Column - 1] = cell.Value;
                         }
                         dataTable.Rows.Add(newRow);
                     }
-                    return dataTable;
+
+                    // clone it and update this one with its data types
+                    DataTable finalDataTable = dataTable.Clone();
+                    finalDataTable.Columns[0].DataType = typeof(int);
+                    finalDataTable.Columns[2].DataType = typeof(bool);
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        finalDataTable.ImportRow(row);
+
+                    }
+
+                    return finalDataTable;
                 }
             }
         }
 
-        [Benchmark]
-        public async Task<bool> WriteDataAsync()
-        {
-            var task = Task.Run(() => WriteData());
-            var result = await task;
-            return result;
-        }
-
+        /// <summary>
+        /// Writes data to a new .xlsx file using the collected DataTable. 
+        /// </summary>
         [Benchmark]
         public async Task<bool> WriteData()
         {
@@ -118,54 +137,68 @@ namespace BenchmarkingExcelPackages
 
             using (ExcelPackage excelPackage = new ExcelPackage())
             {
-                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add("Sheet 1");
-                ExcelWorksheet worksheet2 = excelPackage.Workbook.Worksheets.Add("Sheet 2");
+                try
+                {
+                    ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add("Sheet 1");
+                    ExcelWorksheet worksheet2 = excelPackage.Workbook.Worksheets.Add("Sheet 2");
 
-                // add all the data to the excel sheet, starting at cell A1
-                worksheet.Cells["A2"].LoadFromDataTable(data);
+                    // add all the data to the excel sheet, starting at cell A1 including headers
+                    worksheet.Cells["A1"].LoadFromDataTable(data, true);
 
-                // 1.4, 1.5 get a range of cells
-                var rangeOfCells = worksheet.Cells[2, 6, worksheet.Dimension.End.Row, 6];
+                    if (worksheet.Cells[2, 3, worksheet.Dimension.End.Row, 3].Value.ToString() == "1")
+                    {
+                        worksheet.Cells.Value = "true";
+                    }
 
-                // 1.8 style range with color
-                rangeOfCells.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                rangeOfCells.Style.Fill.BackgroundColor.SetColor(Color.Red);
+                    // 1.4, 1.5 get a range of cells
+                    var rangeOfCells = worksheet.Cells[2, 6, worksheet.Dimension.End.Row, 6];
 
-                // 2 style range using wingdings font
-                rangeOfCells.Style.Font.Name = "WingDings";
-                rangeOfCells.Value = "ü";
+                    // 1.8 style range with color
+                    rangeOfCells.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    rangeOfCells.Style.Fill.BackgroundColor.SetColor(Color.Red);
 
-                // 1.9 add value to a specific cell 
-                var specificCell = worksheet.Cells["I1"];
-                specificCell.Value = "Success";
+                    // 2 style range using wingdings font
+                    rangeOfCells.Style.Font.Name = "WingDings";
+                    rangeOfCells.Value = "ü";
 
-                // 2.1, 2.4 style text using wrap & alignment
-                specificCell.Style.WrapText = true;
-                specificCell.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-                specificCell.Style.TextRotation = 90; //degrees
+                    // 1.9 add value to a specific cell 
+                    var specificCell = worksheet.Cells["I1"];
+                    specificCell.Value = "Success";
 
-                // 2.3 bold font
-                specificCell.Style.Font.Bold = true;
+                    // 2.1, 2.4 style text using wrap & alignment
+                    specificCell.Style.WrapText = true;
+                    specificCell.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                    specificCell.Style.TextRotation = 90; //degrees
 
-                // 2.4 merge cells
-                specificCell = worksheet.Cells["I1:K1"];
-                specificCell.Merge = true;
+                    // 2.3 bold font
+                    specificCell.Style.Font.Bold = true;
 
-                // 2.2 style cell border types
-                specificCell.Style.Border.Top.Style = ExcelBorderStyle.Double;
-                specificCell.Style.Border.Right.Style = ExcelBorderStyle.Double;
-                specificCell.Style.Border.Bottom.Style = ExcelBorderStyle.Double;
-                specificCell.Style.Border.Left.Style = ExcelBorderStyle.Double;
+                    // 2.4 merge cells
+                    specificCell = worksheet.Cells["I1:K1"];
+                    specificCell.Merge = true;
 
-                string initialDir = Directory.GetCurrentDirectory();
-                string parentDir = Directory.GetParent(initialDir).ToString();
-                string targetDir = Directory.GetParent(parentDir).ToString();
+                    // 2.2 style cell border types
+                    specificCell.Style.Border.Top.Style = ExcelBorderStyle.Double;
+                    specificCell.Style.Border.Right.Style = ExcelBorderStyle.Double;
+                    specificCell.Style.Border.Bottom.Style = ExcelBorderStyle.Double;
+                    specificCell.Style.Border.Left.Style = ExcelBorderStyle.Double;
 
-                FileInfo fileInfo = new FileInfo($"{targetDir}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
-                excelPackage.SaveAs(fileInfo);
 
-                return true;
+                    string path = "";
+                    string actualPath = path.SetDirectoryPath();
+
+                    FileInfo fileInfo = new FileInfo($@"{actualPath}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
+                    excelPackage.SaveAs(fileInfo);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw;
+                }
             }
+
         }
     }
 }
