@@ -15,12 +15,16 @@ namespace BenchmarkingExcelPackages
         static async Task Main()
         {
             //EPPlus
-            var EPPlus = new EPPlus();
-            await EPPlus.ReadDataAsync();
-            await EPPlus.WriteDataAsync();
-            Console.WriteLine("EPPlus Read/Write complete...");
+            var epplus = new EPPlus();
+            await epplus.ReadDataAsync();
+            await epplus.WriteDataAsync();
+            Console.WriteLine("epplus read/write complete...");
 
             //NPOI
+            var npoi = new NPOI();
+            npoi.ImportData();
+           // await npoi.writedataasync();
+            Console.WriteLine("epplus read/write complete...");
 
             //ExcelDataReader
 
