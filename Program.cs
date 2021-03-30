@@ -10,7 +10,7 @@ namespace BenchmarkingExcelPackages
         static async Task Main()
         {
             string memoryUsage = "";
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
 
             //set up a stopwatch
             var watch = Stopwatch.StartNew();
@@ -21,31 +21,45 @@ namespace BenchmarkingExcelPackages
             
             WriteLine("Read Method Started...");
             await EPPlus.ReadDataAsync();
+            WriteLine("Read Method Complete...");
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
 
             WriteLine("Write Method Started...");
             await EPPlus.WriteDataAsync();
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
             WriteLine("Write Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
 
             watch.Stop();
-
             WriteLine("EPPlus Processes Complete...");
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
 
             ////NPOI
 
             ////ExcelDataReader and ClosedXML Writer
+            watch.Start();
 
+            var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
+            WriteLine("ExcelDataReader / ClosedXML Writer Processes Started...");
+
+            WriteLine("Read Method Started...");
             ExcelDR.ReadDataFromFile();
-            ExcelDR.WriteDataToFile();
+            WriteLine("Read Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
 
+            WriteLine("Write Method Started...");
+            ExcelDR.WriteDataToFile();
+            WriteLine("Write Complete Method...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
+            watch.Stop();
+            WriteLine("ExcelDataReader / ClosedXML Writer Processes Complete...");
+            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
 
             // ClosedXML Reader only
-
             var ClosedXML = new ClosedXMLReader();
+            WriteLine("ClosedXML Read Data Process Started...");
             ClosedXML.GetDataFromExcel();
-            Console.WriteLine("ClosedXML read data");
+            WriteLine("ClosedXML Read Method Complete...");
 
             //BenchmarkDotNet
 #if (!Debug)
