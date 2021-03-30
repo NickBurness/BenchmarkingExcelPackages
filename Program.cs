@@ -1,10 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
+using static System.Console;
 
 namespace BenchmarkingExcelPackages
 {
@@ -20,28 +17,26 @@ namespace BenchmarkingExcelPackages
 
             //EPPlus
             var EPPlus = new EPPlus();
-
-
-            watch.Start();
-            Console.WriteLine("EPPlus Processes Started...");
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine("Read Method Started...");
+            WriteLine("EPPlus Processes Started...");
+            
+            WriteLine("Read Method Started...");
             await EPPlus.ReadDataAsync();
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine("Write Method Started...");
-            await EPPlus.WriteDataAsync();
-            Console.WriteLine("Write Method Complete...");
-            watch.Stop();
-            Console.WriteLine("EPPlus Read/Write Complete...");
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.ElapsedMilliseconds / 1000} seconds");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
 
+            WriteLine("Write Method Started...");
+            await EPPlus.WriteDataAsync();
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+            WriteLine("Write Method Complete...");
+
+            watch.Stop();
+
+            WriteLine("EPPlus Processes Complete...");
+            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
 
             ////NPOI
 
             ////ExcelDataReader and ClosedXML Writer
 
-            var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
             ExcelDR.ReadDataFromFile();
             ExcelDR.WriteDataToFile();
 
