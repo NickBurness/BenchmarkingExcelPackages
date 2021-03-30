@@ -13,7 +13,9 @@ namespace BenchmarkingExcelPackages
         public DataTable ReadDataFromFile()
 
         {
-            var filePath = @"C:\Users\FKANE\source\repos\ExcelPackages\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx";
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
+            string filePath = $@"{actualPath}\ExcelFiles\SampleData.xlsx";
 
             using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
             {
@@ -33,9 +35,9 @@ namespace BenchmarkingExcelPackages
                             //EmptyColumnNamePrefix = "Column",
 
 
-                    // Gets or sets a value indicating whether to use a row from the 
-                    // data as column names.
-                    UseHeaderRow = true,
+                            // Gets or sets a value indicating whether to use a row from the 
+                            // data as column names.
+                            UseHeaderRow = true,
 
                             // Gets or sets a callback to determine which row is the header row. 
                             // Only called when UseHeaderRow = true.
@@ -61,10 +63,9 @@ namespace BenchmarkingExcelPackages
                             //}
                         }
                     });
-                    Console.WriteLine("table read and configured");
+
                     DataTableCollection resultFromSpreadsheet = result.Tables;
 
-                    // Returns sheet 1 only
                     DataTable resultTable = resultFromSpreadsheet[0];
                     return resultTable;
 
@@ -72,29 +73,14 @@ namespace BenchmarkingExcelPackages
             }
         }
 
-        //public ActionResult WriteDataToExcel()
-        //{
-        //    DataTable dt = getData();
-        //    //Name of File  
-        //    string fileName = "Sample.xlsx";
-        //    using (XLWorkbook wb = new XLWorkbook())
-        //    {
-        //        //Add DataTable in worksheet  
-        //        wb.Worksheets.Add(dt);
-        //        using (MemoryStream stream = new MemoryStream())
-        //        {
-        //            wb.SaveAs(stream);
-        //            //Return xlsx Excel File  
-        //            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-        //        }
-        //    }
 
         [Benchmark]
         public void WriteDataToFile()
 
         {
-
-            String newlyCreatedFilePath = @"C:\Users\FKANE\source\repos\ExcelPackages\BenchmarkingExcelPackages\ExcelFiles\WriteToFile.xlsx";
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
+            string newlyCreatedFilePath = $@"{actualPath}\ExcelFiles\ClosedXMLGeneratedFile.xlsx";
 
             var wb = new XLWorkbook();
             IXLWorksheet ws = wb.Worksheets.Add("Primary", 1);
@@ -107,13 +93,6 @@ namespace BenchmarkingExcelPackages
             var rangeWithData = ws.Cell(2, 1).InsertData(dataTable.AsEnumerable());
             var rangeWithData2 = ws2.Cell(2, 1).InsertData(dataTable.AsEnumerable());
 
-
-            //        //foreach (var ws in Enumerable.Range(1, 2))
-            //        //{
-
-            //        //}
-
-
             ws.Column(1).SetDataType(XLDataType.Number);
             ws.Column(2).SetDataType(XLDataType.Text);
             ws.Column(3).SetDataType(XLDataType.Boolean);
@@ -121,15 +100,9 @@ namespace BenchmarkingExcelPackages
             ws.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
             ws2.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
 
-            //        //Adjust column widths to their content
+            //Adjust column widths to their content
             ws.Columns(1, 5).AdjustToContents();
             ws2.Columns(1, 5).AdjustToContents();
-
-            //        ws2.Column(1).SetDataType(XLDataType.Number);
-            //        ws2.Column(2).SetDataType(XLDataType.Text);
-            //        ws2.Column(3).SetDataType(XLDataType.Boolean);
-            //        ws2.Column(4).SetDataType(XLDataType.Text);
-            //        ws2.Column(5).SetDataType(XLDataType.TimeSpan);
 
             // Prepare the style for the titles
 
@@ -141,10 +114,6 @@ namespace BenchmarkingExcelPackages
             // Format all titles in one shot
             wb.NamedRanges.NamedRange("Titles").Ranges.Style = titlesStyle;
             wb.NamedRanges.NamedRange("Workbook").Ranges.Style = titlesStyle;
-
-
-            //        IXLRange range = ws.Range(ws.Cell(1, 1).Address, ws.Cell(100001, 5).Address);
-            //        range.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
 
             wb.SaveAs(newlyCreatedFilePath);
         }

@@ -285,7 +285,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClosedXML.cs" />
+    <Compile Include="ClosedXMLReader.cs" />
     <Compile Include="EPPlus.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="ExcelDataReaderAndClosedXMLWriter.cs" />

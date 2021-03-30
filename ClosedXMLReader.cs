@@ -5,24 +5,17 @@ using ClosedXML.Excel;
 
 namespace BenchmarkingExcelPackages
 
-//    using (var wb = new XLWorkbook(fileName, XLEventTracking.Disabled))
-//{
-//    var ws = wb.Worksheet(1);
-//DataTable dataTable = ws.RangeUsed().AsTable().AsNativeDataTable();
-///* Process data table as you wish */
-//}
-
-
-
 {
-    public class ClosedXML
+    public class ClosedXMLReader
     {
 
         public DataTable GetDataFromExcel()
         {
-            //IXLWorkbook workBook;
-            Console.WriteLine("created ms");
-            var fileName = @"C:\Users\FKANE\source\repos\ExcelPackages\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx";
+
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
+            string fileName = $@"{actualPath}\ExcelFiles\SampleData.xlsx";
+
 
             using (var wb = new XLWorkbook(fileName, XLEventTracking.Disabled))
             {
@@ -30,14 +23,7 @@ namespace BenchmarkingExcelPackages
 
                 dt = wb.Worksheet(1).Table(0).AsNativeDataTable();
                 var ws = wb.Worksheet(1);
-                //dt = ws.RangeUsed().AsTable().AsNativeDataTable();
 
-                //IXLWorksheet workSheet = wb.Worksheet(0);
-                Console.WriteLine("reading worksheet 0");
-                //Create a new DataTable.
-
-                //DataTable dt = new DataTable();
-                Console.WriteLine("new table created");
                 //Loop through the Worksheet rows.
                 bool firstRow = true;
                 foreach (IXLRow row in ws.Rows())
@@ -69,21 +55,19 @@ namespace BenchmarkingExcelPackages
             }
         }
 
+
         public DataTable GetDataFromExcel2()
         {
-            Console.WriteLine("start method");
-            var filePath = @"C:\Users\FKANE\source\repos\ExcelPackages\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx";
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
+            string file = $@"{actualPath}\ExcelFiles\SmallerSampleData.xlsx";
 
             // Open the Excel file using ClosedXML.
-            // Keep in mind the Excel file cannot be open when trying to read it
-            using (XLWorkbook workBook = new XLWorkbook(filePath))
+            using (XLWorkbook workBook = new XLWorkbook(file))
             {
-                //Read the first Sheet from Excel file.
                 IXLWorksheet workSheet = workBook.Worksheet(1);
-                Console.WriteLine("worksheet 1");
-                //Create a new DataTable.
                 DataTable dt = new DataTable();
-                Console.WriteLine("created dt");
+
                 //Loop through the Worksheet rows.
                 bool firstRow = true;
                 foreach (IXLRow row in workSheet.Rows())
@@ -108,13 +92,11 @@ namespace BenchmarkingExcelPackages
                             i++;
                         }
                     }
-                    Console.WriteLine("data added");
 
                 }
                 return dt;
             }
         }
-
     }
 }
 
