@@ -9,8 +9,10 @@ namespace BenchmarkingExcelPackages
     {
         static async Task Main()
         {
-            var memoryUsage = "";
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+            string memoryUsage = "";
+            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
+            //set up a stopwatch
             var watch = Stopwatch.StartNew();
 
             //EPPlus
@@ -31,20 +33,23 @@ namespace BenchmarkingExcelPackages
             WriteLine("EPPlus Processes Complete...");
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
 
-            //NPOI
+            ////NPOI
 
-            //ExcelDataReader
-            var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
+            ////ExcelDataReader and ClosedXML Writer
 
             ExcelDR.ReadDataFromFile();
-            WriteLine("ExcelDataRead read data");
-
             ExcelDR.WriteDataToFile();
-            WriteLine("ClosedXML written data");
+
+
+            // ClosedXML Reader only
+
+            var ClosedXML = new ClosedXMLReader();
+            ClosedXML.GetDataFromExcel();
+            Console.WriteLine("ClosedXML read data");
 
             //BenchmarkDotNet
 #if (!Debug)
-            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+                        var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
 #endif
             return;
         }
