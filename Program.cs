@@ -49,7 +49,7 @@ namespace BenchmarkingExcelPackages
             // ClosedXML Reader only
 
             var ClosedXML = new ClosedXMLReader();
-            ClosedXML.GetDataFromExcel2();
+            ClosedXML.GetDataFromExcel();
             Console.WriteLine("ClosedXML read data");
 
             //BenchmarkDotNet
