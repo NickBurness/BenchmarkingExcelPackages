@@ -11,11 +11,9 @@ namespace BenchmarkingExcelPackages
         {
             string memoryUsage = "";
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-
-            //set up a stopwatch
             var watch = Stopwatch.StartNew();
 
-            //EPPlus
+            #region EPPlus
             var EPPlus = new EPPlus();
             WriteLine("EPPlus Processes Started...");
             
@@ -32,10 +30,13 @@ namespace BenchmarkingExcelPackages
             watch.Stop();
             WriteLine("EPPlus Processes Complete...");
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
+            #endregion
 
-            ////NPOI
+            #region NPOI
 
-            ////ExcelDataReader and ClosedXML Writer
+            #endregion
+
+            #region ExcelDataReader and ClosedXML Writer
             watch.Start();
 
             var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
@@ -54,16 +55,19 @@ namespace BenchmarkingExcelPackages
             watch.Stop();
             WriteLine("ExcelDataReader / ClosedXML Writer Processes Complete...");
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
+            #endregion
 
-            // ClosedXML Reader only
+            #region ClosedXML Reader only
             var ClosedXML = new ClosedXMLReader();
             WriteLine("ClosedXML Read Data Process Started...");
             ClosedXML.GetDataFromExcel();
             WriteLine("ClosedXML Read Method Complete...");
 
+            #endregion
+
             //BenchmarkDotNet
 #if (!Debug)
-                        var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
 #endif
             return;
         }
