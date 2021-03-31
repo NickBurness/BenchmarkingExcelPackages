@@ -17,33 +17,83 @@ namespace BenchmarkingExcelPackages
         public DataTable ImportData()
         {
             IWorkbook workbook;
-            Stream templateStream = new MemoryStream();
             using (var stream = new FileStream(@"C:\Users\aashraf1\source\repos\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx", FileMode.Open, FileAccess.Read))
             {
                 workbook = new XSSFWorkbook(stream);
             }
             var sheet = workbook.GetSheetAt(0);
-            var datatable = new DataTable(sheet.SheetName);
-            var headerrow = sheet.GetRow(0);
-            foreach(var cell in headerrow)
+            var dataTable = new DataTable(sheet.SheetName);
+            var headerRow = sheet.GetRow(0);
+            foreach(var cell in headerRow)
             {
-                datatable.Columns.Add(cell.ToString());
+                dataTable.Columns.Add(cell.ToString());
             }
             for (int i = 1; i < sheet.PhysicalNumberOfRows; i++)
             {
-                var sheetrow = sheet.GetRow(i);
-                var datatablerow = datatable.NewRow();
-                datatablerow.ItemArray = datatable.Columns.Cast<DataColumn>()
-                    .Select(c => sheetrow.GetCell(c.Ordinal, MissingCellPolicy.CREATE_NULL_AS_BLANK)
+                var sheetRow = sheet.GetRow(i);
+                var dataTableRow = dataTable.NewRow();
+                dataTableRow.ItemArray = dataTable.Columns.Cast<DataColumn>()
+                    .Select(c => sheetRow.GetCell(c.Ordinal, MissingCellPolicy.CREATE_NULL_AS_BLANK)
                     .ToString())
                     .ToArray();
-                datatable.Rows.Add(datatablerow);
+                dataTable.Rows.Add(dataTableRow);
             }
-            return datatable;
+            return dataTable;
+
+        }
+        // Write excel
+        public void WriteData()
+        {
+            DataTable table = ImportData();
+
+// start try
+            IWorkbook workbook = new XSSFWorkbook();
+            ISheet sheet = workbook.CreateSheet("sheet 1");
+            ISheet sheet2 = workbook.CreateSheet("sheet 2");
+
+
+            List<String> columns = new List<string>();
+            IRow sheetRow = sheet.CreateRow(0);
+            int columnIndex = 0;
+
+            foreach (DataColumn column in table.Columns)
+            {
+                columns.Add(column.ColumnName);
+                sheetRow.CreateCell(columnIndex).SetCellValue(column.ColumnName);
+                columnIndex++;
+            }
+
+            int rowIndex = 1;
+            foreach (DataRow row in table.Rows)
+            {
+                sheetRow = sheet.CreateRow(rowIndex);
+                int cellIndex = 0;
+                foreach (String col in columns)
+                {
+                    sheetRow.CreateCell(cellIndex).SetCellValue(row[col].ToString());
+                    cellIndex++;
+                }
+
+                rowIndex++;
+            }
+            using (FileStream fs = new FileStream(@"C:\Users\aashraf1\source\repos\BenchmarkingExcelPackages\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.Open))
+            {
+                workbook.Write(fs);
+            }
+  
+                
+            }
+
+               
+            
         }
     }
-}
- 
+
+
+
+    
+
+
 
 
 //class XXX
@@ -200,7 +250,7 @@ namespace BenchmarkingExcelPackages
 //    }
 //}
 
-    
+
 
 
 

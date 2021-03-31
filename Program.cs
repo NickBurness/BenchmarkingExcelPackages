@@ -14,19 +14,26 @@ namespace BenchmarkingExcelPackages
     {
         static async Task Main()
         {
-            //EPPlus
-            var epplus = new EPPlus();
-            await epplus.ReadDataAsync();
-            await epplus.WriteDataAsync();
-            Console.WriteLine("epplus read/write complete...");
+            ////EPPlus
+            //var epplus = new EPPlus();
+            //await epplus.ReadDataAsync();
+            //await epplus.WriteDataAsync();
+            //Console.WriteLine("epplus read/write complete...");
 
-            //NPOI
-            var npoi = new NPOI();
-            npoi.ImportData();
-           // await npoi.writedataasync();
-            Console.WriteLine("epplus read/write complete...");
+            ////npoi
+            //var npoi = new npoi();
+            //npoi.importdata();
+            //npoi.writedata();
+            //console.writeline("npoi read/write complete...");
 
             //ExcelDataReader
+
+            // ClosedXML
+
+            var ClosedXML = new ClosedXML();
+            ClosedXML.GetDataFromExcel();
+            Console.WriteLine("ClosedXML read data");
+
 
 
             //BenchmarkDotNet
