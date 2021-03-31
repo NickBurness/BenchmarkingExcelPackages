@@ -22,8 +22,9 @@ namespace BenchmarkingExcelPackages
             var watch = Stopwatch.StartNew();
 
             #region EPPlus
+
             var EPPlus = new EPPlus();
-            WriteLine("EPPlus Processes Started...");
+            WriteLine("EPPlus Processes Starting...");
 
             WriteLine("Read Method Started...");
             await EPPlus.ReadDataAsync();
@@ -40,13 +41,25 @@ namespace BenchmarkingExcelPackages
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
             #endregion
 
-            #region
-            //npoi
-            var npoi = new NPOI();
-            npoi.ImportData();
-            npoi.WriteData();
-            WriteLine("npoi read/write complete...");
+            #region NPOI
+            watch.Start();
 
+            var NPOI = new NPOI();
+            WriteLine("NPOI Processes Starting...");
+
+            WriteLine("Read Method Started...");
+            NPOI.ImportData();
+            WriteLine("Read Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
+            WriteLine("Write Method Started...");
+            NPOI.WriteData();
+            WriteLine("Write Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
+            watch.Stop();
+            WriteLine("NPOI Processes Complete...");
+            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
             #endregion
 
             #region ExcelDataReader and ClosedXML Writer
@@ -70,7 +83,6 @@ namespace BenchmarkingExcelPackages
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
             #endregion
 
-
             #region ClosedXML Reader only
             var ClosedXML = new ClosedXMLReader();
             WriteLine("ClosedXML Read Data Process Started...");
@@ -78,11 +90,12 @@ namespace BenchmarkingExcelPackages
             WriteLine("ClosedXML Read Method Complete...");
             #endregion
 
-
-            //BenchmarkDotNet
+            #region BenchmarkDotNet
 #if (!Debug)
             var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
 #endif
+            #endregion
+
             return;
         }
     }
