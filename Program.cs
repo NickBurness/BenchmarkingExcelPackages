@@ -2,6 +2,14 @@
 using System.Threading.Tasks;
 using System.Diagnostics;
 using static System.Console;
+using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Text;
+
 
 namespace BenchmarkingExcelPackages
 {
@@ -16,7 +24,7 @@ namespace BenchmarkingExcelPackages
             #region EPPlus
             var EPPlus = new EPPlus();
             WriteLine("EPPlus Processes Started...");
-            
+
             WriteLine("Read Method Started...");
             await EPPlus.ReadDataAsync();
             WriteLine("Read Method Complete...");
@@ -32,7 +40,12 @@ namespace BenchmarkingExcelPackages
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
             #endregion
 
-            #region NPOI
+            #region
+            //npoi
+            var npoi = new NPOI();
+            npoi.ImportData();
+            npoi.WriteData();
+            WriteLine("npoi read/write complete...");
 
             #endregion
 
@@ -56,17 +69,14 @@ namespace BenchmarkingExcelPackages
             WriteLine("ExcelDataReader / ClosedXML Writer Processes Complete...");
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
             #endregion
-            ////npoi
-            //var npoi = new npoi();
-            //npoi.importdata();
-            //npoi.writedata();
-            //console.writeline("npoi read/write complete...");
+
 
             #region ClosedXML Reader only
             var ClosedXML = new ClosedXMLReader();
             WriteLine("ClosedXML Read Data Process Started...");
             ClosedXML.GetDataFromExcel();
             WriteLine("ClosedXML Read Method Complete...");
+            #endregion
 
 
             //BenchmarkDotNet
