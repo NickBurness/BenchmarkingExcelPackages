@@ -111,10 +111,13 @@ namespace BenchmarkingExcelPackages
                         dataTable.Rows.Add(newRow);
                     }
 
-                    // clone it and update this one with its data types
+                    // clone it and update this one with column data types defined
                     DataTable finalDataTable = dataTable.Clone();
-                    finalDataTable.Columns[0].DataType = typeof(int);
-                    finalDataTable.Columns[2].DataType = typeof(bool);
+                    finalDataTable.Columns[0].DataType = typeof(Double);
+                    finalDataTable.Columns[1].DataType = typeof(String);
+                    finalDataTable.Columns[2].DataType = typeof(Boolean);
+                    finalDataTable.Columns[3].DataType = typeof(String);
+                    finalDataTable.Columns[4].DataType = typeof(DateTime);
 
                     foreach (DataRow row in dataTable.Rows)
                     {
@@ -145,6 +148,8 @@ namespace BenchmarkingExcelPackages
                     // add all the data to the excel sheet, starting at cell A1 including headers
                     worksheet.Cells["A1"].LoadFromDataTable(data, true);
 
+                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
                     if (worksheet.Cells[2, 3, worksheet.Dimension.End.Row, 3].Value.ToString() == "1")
                     {
                         worksheet.Cells.Value = "true";
@@ -152,6 +157,9 @@ namespace BenchmarkingExcelPackages
 
                     // 1.4, 1.5 get a range of cells
                     var rangeOfCells = worksheet.Cells[2, 6, worksheet.Dimension.End.Row, 6];
+                    var dateCells = worksheet.Cells[2, 5, worksheet.Dimension.End.Row, 5];
+
+                    dateCells.Style.Numberformat.Format = "mm-dd-yyyy";
 
                     // 1.8 style range with color
                     rangeOfCells.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -174,7 +182,7 @@ namespace BenchmarkingExcelPackages
                     specificCell.Style.Font.Bold = true;
 
                     // 2.4 merge cells
-                    specificCell = worksheet.Cells["I1:K1"];
+                    specificCell = worksheet.Cells["G1:I1"];
                     specificCell.Merge = true;
 
                     // 2.2 style cell border types
@@ -187,7 +195,7 @@ namespace BenchmarkingExcelPackages
                     string path = "";
                     string actualPath = path.SetDirectoryPath();
 
-                    FileInfo fileInfo = new FileInfo($@"{actualPath}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
+                    FileInfo fileInfo = new FileInfo($@"{actualPath}\ExcelFiles\EPPlusGeneratedFile.xlsx");
                     excelPackage.SaveAs(fileInfo);
 
                     return true;

@@ -1,10 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
+using static System.Console;
 
 namespace BenchmarkingExcelPackages
 {
@@ -13,48 +10,64 @@ namespace BenchmarkingExcelPackages
         static async Task Main()
         {
             string memoryUsage = "";
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-
-            //set up a stopwatch
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
             var watch = Stopwatch.StartNew();
 
-            //EPPlus
+            #region EPPlus
             var EPPlus = new EPPlus();
-
-
-            watch.Start();
-            Console.WriteLine("EPPlus Processes Started...");
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine("Read Method Started...");
+            WriteLine("EPPlus Processes Started...");
+            
+            WriteLine("Read Method Started...");
             await EPPlus.ReadDataAsync();
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine("Write Method Started...");
+            WriteLine("Read Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
+            WriteLine("Write Method Started...");
             await EPPlus.WriteDataAsync();
-            Console.WriteLine("Write Method Complete...");
+            WriteLine("Write Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
             watch.Stop();
-            Console.WriteLine("EPPlus Read/Write Complete...");
-            Console.WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.ElapsedMilliseconds / 1000} seconds");
+            WriteLine("EPPlus Processes Complete...");
+            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
+            #endregion
 
+            #region NPOI
 
-            ////NPOI
+            #endregion
 
-            ////ExcelDataReader and ClosedXML Writer
+            #region ExcelDataReader and ClosedXML Writer
+            watch.Start();
 
             var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
+            WriteLine("ExcelDataReader / ClosedXML Writer Processes Started...");
+
+            WriteLine("Read Method Started...");
             ExcelDR.ReadDataFromFile();
+            WriteLine("Read Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
+            WriteLine("Write Method Started...");
             ExcelDR.WriteDataToFile();
+            WriteLine("Write Complete Method...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
 
+            watch.Stop();
+            WriteLine("ExcelDataReader / ClosedXML Writer Processes Complete...");
+            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
+            #endregion
 
-            // ClosedXML Reader only
-
+            #region ClosedXML Reader only
             var ClosedXML = new ClosedXMLReader();
+            WriteLine("ClosedXML Read Data Process Started...");
             ClosedXML.GetDataFromExcel();
-            Console.WriteLine("ClosedXML read data");
+            WriteLine("ClosedXML Read Method Complete...");
+
+            #endregion
 
             //BenchmarkDotNet
 #if (!Debug)
-                        var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
 #endif
             return;
         }
