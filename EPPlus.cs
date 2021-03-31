@@ -7,7 +7,6 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BenchmarkingExcelPackages
@@ -15,22 +14,6 @@ namespace BenchmarkingExcelPackages
     [MemoryDiagnoser]
     public class EPPlus
     {
-        /// <summary>
-        /// Sets the directory to the /BenchmarkingExcelPackages instead of /BenchmarkingExcelPackages/bin/Release or /bin/Debug
-        /// </summary>
-        public string SetDirectoryPath()
-        {
-            // based on execution context...
-            //starting would be either /bin/debug or /bin/release
-            string initialDir = Directory.GetCurrentDirectory();
-            // so go up one level to /bin
-            string parentDir = Directory.GetParent(initialDir).ToString();
-            // and up another to /BenchmarkingExcelPackages
-            string dir = Directory.GetParent(parentDir).ToString();
-
-            return dir;
-        }
-
         /// <summary>
         /// Implements the ReadData() method as an asynchronous task
         /// </summary>
@@ -59,9 +42,10 @@ namespace BenchmarkingExcelPackages
         [Benchmark]
         public DataTable ReadData()
         {
-            var targetDir = SetDirectoryPath();
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
 
-            byte[] file = File.ReadAllBytes($"{targetDir}\\ExcelFiles\\SampleData.xlsx");
+            byte[] file = File.ReadAllBytes($@"{actualPath}\ExcelFiles\SampleData.xlsx");
 
             var dataTable = new DataTable("Data");
 
@@ -122,11 +106,26 @@ namespace BenchmarkingExcelPackages
                         //loop all cells in the row
                         foreach (var cell in row)
                         {
-                            newRow[cell.Start.Column - 1] = cell.Text;
+                            newRow[cell.Start.Column - 1] = cell.Value;
                         }
                         dataTable.Rows.Add(newRow);
                     }
-                    return dataTable;
+
+                    // clone it and update this one with column data types defined
+                    DataTable finalDataTable = dataTable.Clone();
+                    finalDataTable.Columns[0].DataType = typeof(Double);
+                    finalDataTable.Columns[1].DataType = typeof(String);
+                    finalDataTable.Columns[2].DataType = typeof(Boolean);
+                    finalDataTable.Columns[3].DataType = typeof(String);
+                    finalDataTable.Columns[4].DataType = typeof(DateTime);
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        finalDataTable.ImportRow(row);
+
+                    }
+
+                    return finalDataTable;
                 }
             }
         }
@@ -149,8 +148,18 @@ namespace BenchmarkingExcelPackages
                     // add all the data to the excel sheet, starting at cell A1 including headers
                     worksheet.Cells["A1"].LoadFromDataTable(data, true);
 
+                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                    if (worksheet.Cells[2, 3, worksheet.Dimension.End.Row, 3].Value.ToString() == "1")
+                    {
+                        worksheet.Cells.Value = "true";
+                    }
+
                     // 1.4, 1.5 get a range of cells
                     var rangeOfCells = worksheet.Cells[2, 6, worksheet.Dimension.End.Row, 6];
+                    var dateCells = worksheet.Cells[2, 5, worksheet.Dimension.End.Row, 5];
+
+                    dateCells.Style.Numberformat.Format = "mm-dd-yyyy";
 
                     // 1.8 style range with color
                     rangeOfCells.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -173,7 +182,7 @@ namespace BenchmarkingExcelPackages
                     specificCell.Style.Font.Bold = true;
 
                     // 2.4 merge cells
-                    specificCell = worksheet.Cells["I1:K1"];
+                    specificCell = worksheet.Cells["G1:I1"];
                     specificCell.Merge = true;
 
                     // 2.2 style cell border types
@@ -183,9 +192,10 @@ namespace BenchmarkingExcelPackages
                     specificCell.Style.Border.Left.Style = ExcelBorderStyle.Double;
 
 
-                    var targetDir = SetDirectoryPath();
+                    string path = "";
+                    string actualPath = path.SetDirectoryPath();
 
-                    FileInfo fileInfo = new FileInfo($"{targetDir}\\ExcelFiles\\EPPlusGeneratedFile.xlsx");
+                    FileInfo fileInfo = new FileInfo($@"{actualPath}\ExcelFiles\EPPlusGeneratedFile.xlsx");
                     excelPackage.SaveAs(fileInfo);
 
                     return true;
