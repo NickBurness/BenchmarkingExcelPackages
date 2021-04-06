@@ -5,6 +5,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
 using System.Linq;
+using System.Drawing;
 
 namespace BenchmarkingExcelPackages
 {
@@ -25,10 +26,12 @@ namespace BenchmarkingExcelPackages
             var sheet = workbook.GetSheetAt(0);
             var dataTable = new DataTable(sheet.SheetName);
             var headerRow = sheet.GetRow(0);
+
             foreach (var cell in headerRow)
             {
                 dataTable.Columns.Add(cell.ToString());
             }
+
             for (int i = 1; i < sheet.PhysicalNumberOfRows; i++)
             {
                 var sheetRow = sheet.GetRow(i);
@@ -39,9 +42,10 @@ namespace BenchmarkingExcelPackages
                     .ToArray();
                 dataTable.Rows.Add(dataTableRow);
             }
-            return dataTable;
 
+            return dataTable;
         }
+
         // Write excel
         public void WriteData()
         {
@@ -51,7 +55,6 @@ namespace BenchmarkingExcelPackages
             IWorkbook workbook = new XSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("sheet 1");
             ISheet sheet2 = workbook.CreateSheet("sheet 2");
-
 
             List<String> columns = new List<string>();
             IRow sheetRow = sheet.CreateRow(0);
@@ -78,9 +81,37 @@ namespace BenchmarkingExcelPackages
                 rowIndex++;
             }
 
+            // get a row in this case 1 ... Create a cell at column 6 (no data persists here currently hence create)
+            ICell cell = sheet.GetRow(1).CreateCell(5);
+
+            // styling
+            ICellStyle style = workbook.CreateCellStyle();
+            IFont font = workbook.CreateFont();
+
+            // set up a font...
+            font.IsBold = true;
+            font.FontName = "WingDings";
+            style.SetFont(font);
+
+            //NOTE: this is a bit weird, but it works (setting FillForegroundColor + FillPattern sets up the background...)
+            style.FillForegroundColor = IndexedColors.Red.Index;
+            style.FillPattern = FillPattern.SolidForeground;
+
+            //NOTE: seem to need to deal with all sides of a cell border
+            style.BorderBottom = BorderStyle.Double;
+            style.BorderLeft = BorderStyle.Double;
+            style.BorderTop = BorderStyle.Double;
+            style.BorderRight = BorderStyle.Double;
+
+
+            // set the above styles and add the value that is a tick in wingdings to the selected cell...
+            cell.SetCellValue("ü");
+            cell.CellStyle = style;
+
+
             string path = "";
             string actualPath = path.SetDirectoryPath();
-            using (FileStream fileStream = new FileStream($@"{actualPath}\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.Open))
+            using (FileStream fileStream = new FileStream($@"{actualPath}\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 workbook.Write(fileStream);
             }
