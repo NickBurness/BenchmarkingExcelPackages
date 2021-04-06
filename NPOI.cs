@@ -16,6 +16,10 @@ namespace BenchmarkingExcelPackages
 
         public DataTable ImportData()
         {
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
+            string newlyCreatedFilePath = $@"{actualPath}\ExcelFiles\NPOIGeneratedFile.xlsx";
+
             IWorkbook workbook;
             using (var stream = new FileStream(@"C:\Users\aashraf1\source\repos\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx", FileMode.Open, FileAccess.Read))
             {
@@ -24,7 +28,7 @@ namespace BenchmarkingExcelPackages
             var sheet = workbook.GetSheetAt(0);
             var dataTable = new DataTable(sheet.SheetName);
             var headerRow = sheet.GetRow(0);
-            foreach(var cell in headerRow)
+            foreach (var cell in headerRow)
             {
                 dataTable.Columns.Add(cell.ToString());
             }
@@ -45,12 +49,47 @@ namespace BenchmarkingExcelPackages
         public void WriteData()
         {
             DataTable table = ImportData();
-
-// start try
+            Console.WriteLine("Datatable created");
+            // start try
             IWorkbook workbook = new XSSFWorkbook();
+            Console.WriteLine("Workbook created");
             ISheet sheet = workbook.CreateSheet("sheet 1");
             ISheet sheet2 = workbook.CreateSheet("sheet 2");
+            Console.WriteLine("Worksheets created");
 
+            // Create styling 1
+            //  var getSheet = workbook.GetSheetAt(0);
+            // Get a range of cells
+            //var range = "A1:A6";
+            //var cellRange = CellRangeAddress.ValueOf(range);
+            //var cell = workbook.CreateCellStyle();
+
+            //for (var i = cellRange.FirstRow; i <= cellRange.LastRow; i++)
+            //{
+            //    var row = sheet.GetRow(i);
+            //    for (var j = cellRange.FirstColumn; j <= cellRange.LastColumn; j++)
+            //    {
+            //        skip cell with column index 5(column F)
+            //        if (j == 5) continue;
+
+            //        do your work here
+            //        Console.Write("{0}\t", row.GetCell(j));
+            //    }
+
+            //    Console.WriteLine();
+
+            //}
+            //create styling 2
+            //workbook.GetSheetAt(0);
+            //IRow gRow = sheet.GetRow(0);
+            //ICellStyle colorStyle = workbook.CreateCellStyle();
+            //colorStyle.FillForegroundColor = IndexedColors.Red.Index;
+            //colorStyle.FillPattern = FillPattern.SolidForeground;
+
+
+            //ICell cell = gRow.CreateCell(5);
+            //cell.SetCellValue("test");
+            //cell.CellStyle = colorStyle;
 
             List<String> columns = new List<string>();
             IRow sheetRow = sheet.CreateRow(0);
@@ -76,18 +115,23 @@ namespace BenchmarkingExcelPackages
 
                 rowIndex++;
             }
-            using (FileStream fs = new FileStream(@"C:\Users\aashraf1\source\repos\BenchmarkingExcelPackages\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.Open))
+            
+            using (FileStream fs = new FileStream(@"C:\Users\aashraf1\source\repos\BenchmarkingExcelPackages\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.Create, FileAccess.Write))
             {
                 workbook.Write(fs);
             }
-  
-                
-            }
 
-               
             
+
         }
+
+
     }
+
+
+
+}
+    
 
 
 
