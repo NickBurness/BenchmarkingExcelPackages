@@ -10,53 +10,53 @@ namespace BenchmarkingExcelPackages
     {
         static async Task Main()
         {
-            string memoryUsage = "";
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
-            var watch = Stopwatch.StartNew();
+            //string memoryUsage = "";
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+            //var watch = Stopwatch.StartNew();
 
-            #region EPPlus
+            //#region EPPlus
 
-            var EPPlus = new EPPlus();
-            WriteLine("EPPlus Processes Starting...");
+            //var EPPlus = new EPPlus();
+            //WriteLine("EPPlus Processes Starting...");
 
-            WriteLine("Read Method Started...");
-            await EPPlus.ReadDataAsync();
-            WriteLine("Read Method Complete...");
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
+            //WriteLine("Read Method Started...");
+            //await EPPlus.ReadDataAsync();
+            //WriteLine("Read Method Complete...");
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
-            WriteLine("Write Method Started...");
-            await EPPlus.WriteDataAsync();
-            WriteLine("Write Method Complete...");
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
+            //WriteLine("Write Method Started...");
+            //await EPPlus.WriteDataAsync();
+            //WriteLine("Write Method Complete...");
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
-            watch.Stop();
-            WriteLine("EPPlus Processes Complete...");
-            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
-            #endregion
+            //watch.Stop();
+            //WriteLine("EPPlus Processes Complete...");
+            //WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
+            //#endregion
 
-            #region NPOI
-            watch.Start();
+            //#region NPOI
+            //watch.Start();
 
-            var NPOI = new NPOI();
-            WriteLine("NPOI Processes Starting...");
+            //var NPOI = new NPOI();
+            //WriteLine("NPOI Processes Starting...");
 
-            WriteLine("Read Method Started...");
-            NPOI.ImportData();
-            WriteLine("Read Method Complete...");
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
+            //WriteLine("Read Method Started...");
+            //NPOI.ImportData();
+            //WriteLine("Read Method Complete...");
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
-            WriteLine("Write Method Started...");
-            NPOI.WriteData();
-            WriteLine("Write Method Complete...");
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
+            //WriteLine("Write Method Started...");
+            //NPOI.WriteData();
+            //WriteLine("Write Method Complete...");
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
-            watch.Stop();
-            WriteLine("NPOI Processes Complete...");
-            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
-            #endregion
+            //watch.Stop();
+            //WriteLine("NPOI Processes Complete...");
+            //WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
+            //#endregion
 
             #region ExcelDataReader and ClosedXML Writer
-            watch.Start();
+            //watch.Start();
 
             var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
             WriteLine("ExcelDataReader / ClosedXML Writer Processes Started...");
@@ -64,29 +64,29 @@ namespace BenchmarkingExcelPackages
             WriteLine("Read Method Started...");
             ExcelDR.ReadDataFromFile();
             WriteLine("Read Method Complete...");
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
             WriteLine("Write Method Started...");
             ExcelDR.WriteDataToFile();
             WriteLine("Write Complete Method...");
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
-            watch.Stop();
+            //watch.Stop();
             WriteLine("ExcelDataReader / ClosedXML Writer Processes Complete...");
-            WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
+            //WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
             #endregion
 
-            #region ClosedXML Reader only
-            watch.Start();
-            var ClosedXML = new ClosedXMLReader();
-            WriteLine("ClosedXML Read Data Process Started...");
-            ClosedXML.GetDataFromExcel();
-            WriteLine("ClosedXML Read Method Complete...");
-            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
+            //#region ClosedXML Reader only
+            //watch.Start();
+            //var ClosedXML = new ClosedXMLReader();
+            //WriteLine("ClosedXML Read Data Process Started...");
+            //ClosedXML.GetDataFromExcel();
+            //WriteLine("ClosedXML Read Method Complete...");
+            //WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
-            watch.Stop();
-            WriteLine($"Read Process Only - Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
-            #endregion
+            //watch.Stop();
+            //WriteLine($"Read Process Only - Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
+            //#endregion
 
             #region BenchmarkDotNet
 #if (!Debug)

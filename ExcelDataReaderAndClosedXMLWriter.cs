@@ -118,6 +118,16 @@ namespace BenchmarkingExcelPackages
             rangeForWingDings.Value = char.ConvertFromUtf32(0x00002713);
             rangeForWingDings.Style.Fill.BackgroundColor = XLColor.Red;
 
+            // Merge cells
+            var mergedCellrange = ws.Range(2, 10, 2, 12);
+            mergedCellrange.Cell(1, 1).Value = "merged";
+            mergedCellrange.Merge();
+
+            // outside border
+            var outsideBorderRange = ws.Range(2, 10, 2, 12);
+            outsideBorderRange.Style.Border.OutsideBorder = XLBorderStyleValues.Double;
+
+
             wb.SaveAs(newlyCreatedFilePath);
         }
 
