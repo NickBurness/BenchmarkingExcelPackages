@@ -23,6 +23,7 @@ namespace BenchmarkingExcelPackages
                 {
                     var result = reader.AsDataSet(new ExcelDataSetConfiguration()
                     {
+
                         UseColumnDataType = true,
 
                         // Gets or sets a callback to determine whether to include the current sheet
@@ -32,7 +33,7 @@ namespace BenchmarkingExcelPackages
                         ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
                         {
                             // Gets or sets a value indicating the prefix of generated column names.
-                            //EmptyColumnNamePrefix = "Column",
+                            EmptyColumnNamePrefix = "Column",
 
 
                             // Gets or sets a value indicating whether to use a row from the 
@@ -49,19 +50,20 @@ namespace BenchmarkingExcelPackages
 
                             // Gets or sets a callback to determine whether to include the 
                             // current row in the DataTable.
-                            //FilterRow = (rowReader) =>
-                            //{
-                            //    return true;
-                            //},
+                            FilterRow = (rowReader) =>
+                            {
+                                return true;
+                            },
 
                             // Gets or sets a callback to determine whether to include the specific
                             // column in the DataTable. Called once per column after reading the 
                             // headers.
-                            //FilterColumn = (rowReader, columnIndex) =>
-                            //{
-                            //    return true;
-                            //}
+                            FilterColumn = (rowReader, columnIndex) =>
+                            {
+                                return true;
+                            }
                         }
+
                     });
 
                     DataTableCollection resultFromSpreadsheet = result.Tables;
@@ -71,6 +73,7 @@ namespace BenchmarkingExcelPackages
 
                 }
             }
+
         }
 
 
@@ -88,6 +91,7 @@ namespace BenchmarkingExcelPackages
 
             var dataTable = ReadDataFromFile();
 
+
             ws.Range(1, 1, 1, 5).Merge().AddToNamed("Titles");
             ws2.Range(1, 1, 1, 5).Merge().AddToNamed("Workbook");
             var rangeWithData = ws.Cell(2, 1).InsertData(dataTable.AsEnumerable());
@@ -104,19 +108,19 @@ namespace BenchmarkingExcelPackages
             ws.Columns(1, 5).AdjustToContents();
             ws2.Columns(1, 5).AdjustToContents();
 
-            // Prepare the style for the titles
+            // Prepare the style 
 
-            var titlesStyle = wb.Style;
-            titlesStyle.Font.Bold = true;
-            titlesStyle.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-            titlesStyle.Fill.BackgroundColor = XLColor.AppleGreen;
+            var dataStyle = ws.Style;
+            dataStyle.Alignment.Vertical = XLAlignmentVerticalValues.Center;
 
-            // Format all titles in one shot
-            wb.NamedRanges.NamedRange("Titles").Ranges.Style = titlesStyle;
-            wb.NamedRanges.NamedRange("Workbook").Ranges.Style = titlesStyle;
+            // wingdings column
+            var rangeForWingDings = ws.Range(2, 6, 100000, 6).AddToNamed("wingdings");
+            rangeForWingDings.Value = char.ConvertFromUtf32(0x00002713);
+            rangeForWingDings.Style.Fill.BackgroundColor = XLColor.Red;
 
             wb.SaveAs(newlyCreatedFilePath);
         }
+
     }
 }
 
