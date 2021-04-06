@@ -8,6 +8,8 @@ using NPOI.HSSF.Util;
 using NPOI.SS.Util;
 using System.Data;
 using System.Linq;
+using NPOI.SS;
+using System.Drawing;
 
 namespace BenchmarkingExcelPackages
 {
@@ -51,10 +53,10 @@ namespace BenchmarkingExcelPackages
             DataTable table = ImportData();
             Console.WriteLine("Datatable created");
             // start try
-            IWorkbook workbook = new XSSFWorkbook();
+            //IWorkbook workbook = new XSSFWorkbook();
             Console.WriteLine("Workbook created");
-            ISheet sheet = workbook.CreateSheet("sheet 1");
-            ISheet sheet2 = workbook.CreateSheet("sheet 2");
+           // ISheet sheet = workbook.CreateSheet("sheet 1");
+            //ISheet sheet2 = workbook.CreateSheet("sheet 2");
             Console.WriteLine("Worksheets created");
 
             // Create styling 1
@@ -80,8 +82,32 @@ namespace BenchmarkingExcelPackages
 
             //}
             //create styling 2
-            //workbook.GetSheetAt(0);
-            //IRow gRow = sheet.GetRow(0);
+            //gets first worksheet
+            // XSSFWorkbook ws = (XSSFWorkbook)workbook.GetSheet("sheet 1");
+            var workbook = new XSSFWorkbook(); 
+            ISheet sheet = ((XSSFWorkbook)workbook).CreateSheet("sheetOne");
+            ICell cell = sheet.CreateRow(1).CreateCell(3);
+
+
+            for (int i = 0; i < 5; i++)
+            {
+                IRow row = sheet.CreateRow(i);
+                Console.WriteLine("created row");
+                for (int j = 0; j < 4; j++)
+                {
+                    cell = row.CreateCell(j);
+                    Console.WriteLine("cell created");
+                    cell.SetCellValue("test");
+                    setCellStyle(workbook, cell);
+                    Console.WriteLine("style set");
+                }
+            }
+
+           
+
+
+
+            // IRow gRow = sheet.GetRow(0);
             //ICellStyle colorStyle = workbook.CreateCellStyle();
             //colorStyle.FillForegroundColor = IndexedColors.Red.Index;
             //colorStyle.FillPattern = FillPattern.SolidForeground;
@@ -90,6 +116,8 @@ namespace BenchmarkingExcelPackages
             //ICell cell = gRow.CreateCell(5);
             //cell.SetCellValue("test");
             //cell.CellStyle = colorStyle;
+
+
 
             List<String> columns = new List<string>();
             IRow sheetRow = sheet.CreateRow(0);
@@ -124,18 +152,40 @@ namespace BenchmarkingExcelPackages
             
 
         }
+        public void setCellStyle(XSSFWorkbook workbook, ICell cell)
+        {
+            XSSFCellStyle fCellStyle = (XSSFCellStyle)workbook.CreateCellStyle();
 
+            //fCellStyle.FillForegroundColor = XSSFColor.ToXSSFColor(color);
+            //fCellStyle.FillPattern = FillPattern.SolidForeground;
+            //fCellStyle = (XSSFCellStyle)cell.getCellStyle();
+            XSSFColor myColor = new XSSFColor(Color.Red);
+            fCellStyle.SetFillBackgroundColor(myColor);
+            
+
+
+            XSSFFont ffont = (XSSFFont)workbook.CreateFont();
+            ffont.FontHeight = 20 * 20;
+            //ffont.Color = XSSFColor.Red.Index;
+            fCellStyle.SetFont(ffont);
+
+            fCellStyle.VerticalAlignment = VerticalAlignment.Center;
+            fCellStyle.Alignment = HorizontalAlignment.Center;
+
+            cell.CellStyle = fCellStyle;
+        }
 
     }
-
+    
 
 
 }
-    
 
 
 
-    
+
+
+
 
 
 
