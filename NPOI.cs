@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using NPOI.HSSF.Util;
-using NPOI.SS.Util;
 using System.Data;
 using System.Linq;
 
@@ -13,18 +10,22 @@ namespace BenchmarkingExcelPackages
 {
     public class NPOI
     {
+        private IWorkbook workbook;
 
         public DataTable ImportData()
         {
-            IWorkbook workbook;
-            using (var stream = new FileStream(@"C:\Users\aashraf1\source\repos\BenchmarkingExcelPackages\ExcelFiles\SampleData.xlsx", FileMode.Open, FileAccess.Read))
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
+
+            using (var stream = new FileStream($@"{actualPath}\ExcelFiles\SampleData.xlsx", FileMode.Open, FileAccess.Read))
             {
                 workbook = new XSSFWorkbook(stream);
             }
+
             var sheet = workbook.GetSheetAt(0);
             var dataTable = new DataTable(sheet.SheetName);
             var headerRow = sheet.GetRow(0);
-            foreach(var cell in headerRow)
+            foreach (var cell in headerRow)
             {
                 dataTable.Columns.Add(cell.ToString());
             }
@@ -46,7 +47,7 @@ namespace BenchmarkingExcelPackages
         {
             DataTable table = ImportData();
 
-// start try
+            // start try
             IWorkbook workbook = new XSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("sheet 1");
             ISheet sheet2 = workbook.CreateSheet("sheet 2");
@@ -76,24 +77,16 @@ namespace BenchmarkingExcelPackages
 
                 rowIndex++;
             }
-            using (FileStream fs = new FileStream(@"C:\Users\aashraf1\source\repos\BenchmarkingExcelPackages\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.Open))
-            {
-                workbook.Write(fs);
-            }
-  
-                
-            }
 
-               
-            
+            string path = "";
+            string actualPath = path.SetDirectoryPath();
+            using (FileStream fileStream = new FileStream($@"{actualPath}\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.Open))
+            {
+                workbook.Write(fileStream);
+            }
         }
     }
-
-
-
-    
-
-
+}
 
 
 //class XXX

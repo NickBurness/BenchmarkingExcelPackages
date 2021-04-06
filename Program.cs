@@ -2,13 +2,6 @@
 using System.Threading.Tasks;
 using System.Diagnostics;
 using static System.Console;
-using OfficeOpenXml;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 
 namespace BenchmarkingExcelPackages
@@ -84,10 +77,15 @@ namespace BenchmarkingExcelPackages
             #endregion
 
             #region ClosedXML Reader only
+            watch.Start();
             var ClosedXML = new ClosedXMLReader();
             WriteLine("ClosedXML Read Data Process Started...");
             ClosedXML.GetDataFromExcel();
             WriteLine("ClosedXML Read Method Complete...");
+            WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
+
+            watch.Stop();
+            WriteLine($"Read Process Only - Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds");
             #endregion
 
             #region BenchmarkDotNet
