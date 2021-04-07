@@ -4,11 +4,33 @@ using System.Data;
 using System.IO;
 using BenchmarkDotNet.Attributes;
 using ClosedXML.Excel;
+using System.Threading.Tasks;
+
 
 namespace BenchmarkingExcelPackages
 {
     public class ExcelDataReaderAndClosedXMLWriter
     {
+
+        [Benchmark]
+        public async Task<DataTable> ReadExcelDataAsync()
+        {
+            var task = Task.Run(() => ReadDataFromFile());
+            var result = await task;
+            return result;
+        }
+
+        [Benchmark]
+        public async Task<XLWorkbook> WriteClosedXMLDataAsync()
+        {
+            var task = Task.Run(() => WriteDataToFile());
+            var result = await task;
+            return result;
+        }
+
+
+
+        // Read data from file using Excel Data Reader library
         [Benchmark]
         public DataTable ReadDataFromFile()
 
@@ -76,9 +98,10 @@ namespace BenchmarkingExcelPackages
 
         }
 
+        // Writes data using Closed XML library
 
         [Benchmark]
-        public void WriteDataToFile()
+        public async Task<XLWorkbook> WriteDataToFile()
 
         {
             string path = "";
@@ -87,26 +110,26 @@ namespace BenchmarkingExcelPackages
 
             var wb = new XLWorkbook();
             IXLWorksheet ws = wb.Worksheets.Add("Primary", 1);
-            IXLWorksheet ws2 = wb.Worksheets.Add("Secondary", 2);
+            //IXLWorksheet ws2 = wb.Worksheets.Add("Secondary", 2);
 
-            var dataTable = ReadDataFromFile();
+            var dataTable = await ReadExcelDataAsync();
 
 
             ws.Range(1, 1, 1, 5).Merge().AddToNamed("Titles");
-            ws2.Range(1, 1, 1, 5).Merge().AddToNamed("Workbook");
+            //ws2.Range(1, 1, 1, 5).Merge().AddToNamed("Workbook");
             var rangeWithData = ws.Cell(2, 1).InsertData(dataTable.AsEnumerable());
-            var rangeWithData2 = ws2.Cell(2, 1).InsertData(dataTable.AsEnumerable());
+            //var rangeWithData2 = ws2.Cell(2, 1).InsertData(dataTable.AsEnumerable());
 
             ws.Column(1).SetDataType(XLDataType.Number);
             ws.Column(2).SetDataType(XLDataType.Text);
             ws.Column(3).SetDataType(XLDataType.Boolean);
             ws.Column(4).SetDataType(XLDataType.Text);
             ws.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
-            ws2.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
+            //ws2.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
 
             //Adjust column widths to their content
             ws.Columns(1, 5).AdjustToContents();
-            ws2.Columns(1, 5).AdjustToContents();
+            //ws2.Columns(1, 5).AdjustToContents();
 
             // Prepare the style 
 
@@ -129,7 +152,10 @@ namespace BenchmarkingExcelPackages
 
 
             wb.SaveAs(newlyCreatedFilePath);
+
+            return wb;
         }
+
 
     }
 }
