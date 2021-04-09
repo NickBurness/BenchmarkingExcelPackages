@@ -4,11 +4,33 @@ using System.Data;
 using System.IO;
 using BenchmarkDotNet.Attributes;
 using ClosedXML.Excel;
+using System.Threading.Tasks;
+
 
 namespace BenchmarkingExcelPackages
 {
     public class ExcelDataReaderAndClosedXMLWriter
     {
+
+        [Benchmark]
+        public async Task<DataTable> ReadExcelDataAsync()
+        {
+            var task = Task.Run(() => ReadDataFromFile());
+            var result = await task;
+            return result;
+        }
+
+        [Benchmark]
+        public async Task<XLWorkbook> WriteClosedXMLDataAsync()
+        {
+            var task = Task.Run(() => WriteDataToFile());
+            var result = await task;
+            return result;
+        }
+
+
+
+        // Read data from file using Excel Data Reader library
         [Benchmark]
         public DataTable ReadDataFromFile()
 
@@ -23,6 +45,7 @@ namespace BenchmarkingExcelPackages
                 {
                     var result = reader.AsDataSet(new ExcelDataSetConfiguration()
                     {
+
                         UseColumnDataType = true,
 
                         // Gets or sets a callback to determine whether to include the current sheet
@@ -32,7 +55,7 @@ namespace BenchmarkingExcelPackages
                         ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
                         {
                             // Gets or sets a value indicating the prefix of generated column names.
-                            //EmptyColumnNamePrefix = "Column",
+                            EmptyColumnNamePrefix = "Column",
 
 
                             // Gets or sets a value indicating whether to use a row from the 
@@ -49,19 +72,20 @@ namespace BenchmarkingExcelPackages
 
                             // Gets or sets a callback to determine whether to include the 
                             // current row in the DataTable.
-                            //FilterRow = (rowReader) =>
-                            //{
-                            //    return true;
-                            //},
+                            FilterRow = (rowReader) =>
+                            {
+                                return true;
+                            },
 
                             // Gets or sets a callback to determine whether to include the specific
                             // column in the DataTable. Called once per column after reading the 
                             // headers.
-                            //FilterColumn = (rowReader, columnIndex) =>
-                            //{
-                            //    return true;
-                            //}
+                            FilterColumn = (rowReader, columnIndex) =>
+                            {
+                                return true;
+                            }
                         }
+
                     });
 
                     DataTableCollection resultFromSpreadsheet = result.Tables;
@@ -71,11 +95,13 @@ namespace BenchmarkingExcelPackages
 
                 }
             }
+
         }
 
+        // Writes data using Closed XML library
 
         [Benchmark]
-        public void WriteDataToFile()
+        public async Task<XLWorkbook> WriteDataToFile()
 
         {
             string path = "";
@@ -84,39 +110,53 @@ namespace BenchmarkingExcelPackages
 
             var wb = new XLWorkbook();
             IXLWorksheet ws = wb.Worksheets.Add("Primary", 1);
-            IXLWorksheet ws2 = wb.Worksheets.Add("Secondary", 2);
+            //IXLWorksheet ws2 = wb.Worksheets.Add("Secondary", 2);
 
-            var dataTable = ReadDataFromFile();
+            var dataTable = await ReadExcelDataAsync();
+
 
             ws.Range(1, 1, 1, 5).Merge().AddToNamed("Titles");
-            ws2.Range(1, 1, 1, 5).Merge().AddToNamed("Workbook");
+            //ws2.Range(1, 1, 1, 5).Merge().AddToNamed("Workbook");
             var rangeWithData = ws.Cell(2, 1).InsertData(dataTable.AsEnumerable());
-            var rangeWithData2 = ws2.Cell(2, 1).InsertData(dataTable.AsEnumerable());
+            //var rangeWithData2 = ws2.Cell(2, 1).InsertData(dataTable.AsEnumerable());
 
             ws.Column(1).SetDataType(XLDataType.Number);
             ws.Column(2).SetDataType(XLDataType.Text);
             ws.Column(3).SetDataType(XLDataType.Boolean);
             ws.Column(4).SetDataType(XLDataType.Text);
             ws.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
-            ws2.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
+            //ws2.Column(5).Style.NumberFormat.Format = "mm/dd/yyyy";
 
             //Adjust column widths to their content
             ws.Columns(1, 5).AdjustToContents();
-            ws2.Columns(1, 5).AdjustToContents();
+            //ws2.Columns(1, 5).AdjustToContents();
 
-            // Prepare the style for the titles
+            // Prepare the style 
 
-            var titlesStyle = wb.Style;
-            titlesStyle.Font.Bold = true;
-            titlesStyle.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-            titlesStyle.Fill.BackgroundColor = XLColor.AppleGreen;
+            var dataStyle = ws.Style;
+            dataStyle.Alignment.Vertical = XLAlignmentVerticalValues.Center;
 
-            // Format all titles in one shot
-            wb.NamedRanges.NamedRange("Titles").Ranges.Style = titlesStyle;
-            wb.NamedRanges.NamedRange("Workbook").Ranges.Style = titlesStyle;
+            // wingdings column
+            var rangeForWingDings = ws.Range(2, 6, 100000, 6).AddToNamed("wingdings");
+            rangeForWingDings.Value = char.ConvertFromUtf32(0x00002713);
+            rangeForWingDings.Style.Fill.BackgroundColor = XLColor.Red;
+
+            // Merge cells
+            var mergedCellrange = ws.Range(2, 10, 2, 12);
+            mergedCellrange.Cell(1, 1).Value = "merged";
+            mergedCellrange.Merge();
+
+            // outside border
+            var outsideBorderRange = ws.Range(2, 10, 2, 12);
+            outsideBorderRange.Style.Border.OutsideBorder = XLBorderStyleValues.Double;
+
 
             wb.SaveAs(newlyCreatedFilePath);
+
+            return wb;
         }
+
+
     }
 }
 
