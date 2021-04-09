@@ -16,16 +16,16 @@ namespace BenchmarkingExcelPackages
 
             #region EPPlus
 
-            var EPPlus = new EPPlus();
+            var epplus = new EPPlus();
             WriteLine("EPPlus Processes Starting...");
 
             WriteLine("Read Method Started...");
-            await EPPlus.ReadDataAsync();
+            await epplus.ReadDataAsync();
             WriteLine("Read Method Complete...");
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
             WriteLine("Write Method Started...");
-            await EPPlus.WriteDataAsync();
+            await epplus.WriteDataAsync();
             WriteLine("Write Method Complete...");
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
@@ -62,12 +62,12 @@ namespace BenchmarkingExcelPackages
             WriteLine("ExcelDataReader / ClosedXML Writer Processes Started...");
 
             WriteLine("Read Method Started...");
-            ExcelDR.ReadDataFromFile();
+            await ExcelDR.ReadExcelDataAsync();
             WriteLine("Read Method Complete...");
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
             WriteLine("Write Method Started...");
-            ExcelDR.WriteDataToFile();
+            await ExcelDR.WriteClosedXMLDataAsync();
             WriteLine("Write Complete Method...");
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
