@@ -42,12 +42,12 @@ namespace BenchmarkingExcelPackages
             WriteLine("NPOI Processes Starting...");
 
             WriteLine("Read Method Started...");
-            NPOI.ImportData();
+            await NPOI.ImportDataAsync();
             WriteLine("Read Method Complete...");
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
             WriteLine("Write Method Started...");
-            NPOI.WriteData();
+            await NPOI.WriteDataAsync();
             WriteLine("Write Method Complete...");
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage() + "\n");
 
@@ -78,6 +78,7 @@ namespace BenchmarkingExcelPackages
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
             #endregion
 
+            //?
             #region ClosedXML Reader only
             watch.Reset();
             watch.Start();

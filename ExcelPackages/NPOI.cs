@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Attributes;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using NPOI.SS.UserModel;
@@ -6,13 +7,28 @@ using NPOI.XSSF.UserModel;
 using System.Data;
 using System.Linq;
 using System.Drawing;
+using NPOI.SS.Util;
+using System.Windows;
+using NPOI.HSSF.Util;
+using System.Threading.Tasks;
 
 namespace BenchmarkingExcelPackages
 {
+    [MemoryDiagnoser]
     public class NPOI
     {
         private IWorkbook workbook;
 
+        public async Task<DataTable> ImportDataAsync()
+        {
+            var task = Task.Run(() => ImportData());
+            var result = await task;
+
+            return result;
+        }
+
+
+        [Benchmark]
         public DataTable ImportData()
         {
             string path = "";
@@ -46,228 +62,101 @@ namespace BenchmarkingExcelPackages
             return dataTable;
         }
 
-        // Write excel
-        public void WriteData()
+        [Benchmark]
+        public async Task<bool> WriteDataAsync()
         {
-            DataTable table = ImportData();
+            var task = Task.Run(() => WriteData());
+            var result = await task;
+            return result;
+        }
 
-            // start try
-            IWorkbook workbook = new XSSFWorkbook();
-            ISheet sheet = workbook.CreateSheet("sheet 1");
-            ISheet sheet2 = workbook.CreateSheet("sheet 2");
 
-            List<String> columns = new List<string>();
-            IRow sheetRow = sheet.CreateRow(0);
-            int columnIndex = 0;
+        [Benchmark]
+        public async Task<bool> WriteData()
+        {
+            DataTable table = await ImportDataAsync();
 
-            foreach (DataColumn column in table.Columns)
+            try
             {
-                columns.Add(column.ColumnName);
-                sheetRow.CreateCell(columnIndex).SetCellValue(column.ColumnName);
-                columnIndex++;
-            }
+                IWorkbook workbook = new XSSFWorkbook();
+                ISheet sheet = workbook.CreateSheet("sheet 1");
+                ISheet sheet2 = workbook.CreateSheet("sheet 2");
 
-            int rowIndex = 1;
-            foreach (DataRow row in table.Rows)
-            {
-                sheetRow = sheet.CreateRow(rowIndex);
-                int cellIndex = 0;
-                foreach (String col in columns)
+                List<String> columns = new List<string>();
+                IRow sheetRow = sheet.CreateRow(0);
+                int columnIndex = 0;
+
+                foreach (DataColumn column in table.Columns)
                 {
-                    sheetRow.CreateCell(cellIndex).SetCellValue(row[col].ToString());
-                    cellIndex++;
+                    columns.Add(column.ColumnName);
+                    sheetRow.CreateCell(columnIndex).SetCellValue(column.ColumnName);
+                    columnIndex++;
                 }
 
-                rowIndex++;
+                int rowIndex = 1;
+                foreach (DataRow row in table.Rows)
+                {
+                    sheetRow = sheet.CreateRow(rowIndex);
+                    int cellIndex = 0;
+                    foreach (String col in columns)
+                    {
+                        sheetRow.CreateCell(cellIndex).SetCellValue(row[col].ToString());
+                        cellIndex++;
+                    }
+
+                    rowIndex++;
+                }
+
+                // get a row in this case 1 ... Create a cell at column 6 (no data persists here currently hence create)
+
+                ICellStyle style = workbook.CreateCellStyle();
+                IFont font = workbook.CreateFont();
+                //Loops styling
+                for (var i = 1; i <= sheet.LastRowNum; i++)
+                {
+                    var cell = sheet.GetRow(i).CreateCell(5);
+                    if (cell == null)
+                    {
+                        continue;
+                    }
+
+                    font.IsBold = true;
+                    font.FontName = "WingDings";
+                    style.SetFont(font);
+
+                    style.FillForegroundColor = IndexedColors.Red.Index;
+                    style.FillPattern = FillPattern.SolidForeground;
+
+                    cell.SetCellValue("ü");
+                    cell.CellStyle = style;
+                }
+
+                //Creates single border around merged cells.
+                sheet.GetRow(0);
+                CellRangeAddress region = new CellRangeAddress(0, 0, 6, 8);
+                sheet.AddMergedRegion(region);
+
+                //Note: The first parameter 1 indicates the thickness of the border  
+                RegionUtil.SetBorderBottom(1, region, sheet);//Bottom border  
+                RegionUtil.SetBorderLeft(1, region, sheet);//Left border  
+                RegionUtil.SetBorderRight(1, region, sheet);//Right border  
+                RegionUtil.SetBorderTop(1, region, sheet);//top border
+
+
+                string path = "";
+                string actualPath = path.SetDirectoryPath();
+                using (FileStream fileStream = new FileStream($@"{actualPath}\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    workbook.Write(fileStream);
+                }
+                return true;
             }
-
-            ICellStyle style = workbook.CreateCellStyle();
-            IFont font = workbook.CreateFont();
-
-            for (var i = 1; i <= sheet.LastRowNum; i++)
+            catch (Exception ex)
             {
-                var cell = sheet.GetRow(i).CreateCell(5);
-                if (cell == null) continue;
-
-                font.IsBold = true;
-                font.FontName = "WingDings";
-                style.SetFont(font);
-
-                style.FillForegroundColor = IndexedColors.Red.Index;
-                style.FillPattern = FillPattern.SolidForeground;
-
-                cell.SetCellValue("ü");
-                cell.CellStyle = style;
-            }
-
-
-            string path = "";
-            string actualPath = path.SetDirectoryPath();
-            using (FileStream fileStream = new FileStream($@"{actualPath}\ExcelFiles\NPOIGeneratedFile.xlsx", FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                workbook.Write(fileStream);
+                Console.WriteLine(ex.Message);
+                throw;
             }
         }
+
     }
 }
-
-
-//class XXX
-//{
-//    public int Cell { get; set; }
-//    public string Value { get; set; }
-//}
-
-//private static void ImportExcel()
-//{
-
-//    var newFile = "newbook2.core.xlsx";
-//    var celldata = new List<XXX>{
-//                new XXX{ Cell =0,Value="00000"},
-//                new XXX{ Cell = 1,Value = "1111111"  }
-//            };
-
-//    using (var fs = new FileStream(newFile, FileMode.Create, FileAccess.Write))
-//    {
-//        //excelPath
-//        IWorkbook wb = new XSSFWorkbook("newbook.core.xlsx");
-
-//        ISheet sheet1 = wb.GetSheetAt(0);
-
-//        //celldata        
-//        foreach (var x in celldata)
-//        {
-//            IRow row = sheet1.GetRow(x.Cell);
-//            row.GetCell(x.Cell).SetCellValue(x.Value);
-//        }
-//        wb.Write(fs);
-//    }
-//}
-
-//private static void ExportExcelHSSF()
-//{
-//    var newFile = @"newbook.core.xls";
-
-//    using (var fs = new FileStream(newFile, FileMode.Create, FileAccess.Write))
-//    {
-//        IWorkbook workbook = new HSSFWorkbook();
-//        ISheet sheet1 = workbook.CreateSheet("Sheet1");
-//        sheet1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 10));
-//        //ICreationHelper cH = wb.GetCreationHelper();
-//        var rowIndex = 0;
-//        IRow row = sheet1.CreateRow(rowIndex);
-//        row.Height = 30 * 80;
-//        var cell = row.CreateCell(0);
-//        var font = workbook.CreateFont();
-//        font.IsBold = true;
-//        font.Color = HSSFColor.DarkBlue.Index2;
-//        cell.CellStyle.SetFont(font);
-
-//        cell.SetCellValue("A very long piece of text that I want to auto-fit innit, yeah. Although if it gets really, really long it'll probably start messing up more.");
-//        sheet1.AutoSizeColumn(0);
-//        rowIndex++;
-
-//        // create sheet
-//        var sheet2 = workbook.CreateSheet("My Sheet");
-//        // create cell styles?
-//        var style1 = workbook.CreateCellStyle();
-//        style1.FillForegroundColor = HSSFColor.Blue.Index2;
-//        style1.FillPattern = FillPattern.SolidForeground;
-
-//        var style2 = workbook.CreateCellStyle();
-//        style2.FillForegroundColor = HSSFColor.Yellow.Index2;
-//        style2.FillPattern = FillPattern.SolidForeground;
-
-//        // format cells?
-//        var cell2 = sheet2.CreateRow(0).CreateCell(0);
-//        cell2.CellStyle = style1;
-//        cell2.SetCellValue(0);
-
-//        cell2 = sheet2.CreateRow(1).CreateCell(0);
-//        cell2.CellStyle = style2;
-//        cell2.SetCellValue(1);
-
-//        cell2 = sheet2.CreateRow(2).CreateCell(0);
-//        cell2.CellStyle = style1;
-//        cell2.SetCellValue(2);
-
-//        cell2 = sheet2.CreateRow(3).CreateCell(0);
-//        cell2.CellStyle = style2;
-//        cell2.SetCellValue(3);
-
-//        cell2 = sheet2.CreateRow(4).CreateCell(0);
-//        cell2.CellStyle = style1;
-//        cell2.SetCellValue(4);
-
-//        workbook.Write(fs);
-//    }
-//    Console.WriteLine("Excel  Done");
-//}
-//private static void ExportExcel()
-//{
-//    var newFile = @"newbook.core.xlsx";
-
-//    using (var fs = new FileStream(newFile, FileMode.Create, FileAccess.Write))
-//    {
-//        IWorkbook workbook = new XSSFWorkbook();
-//        ISheet sheet1 = workbook.CreateSheet("Sheet1");
-//        sheet1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 10));
-//        //ICreationHelper cH = wb.GetCreationHelper();
-//        var rowIndex = 0;
-//        IRow row = sheet1.CreateRow(rowIndex);
-//        row.Height = 30 * 80;
-//        var cell = row.CreateCell(0);
-//        var font = workbook.CreateFont();
-//        font.IsBold = true;
-//        font.Color = HSSFColor.DarkBlue.Index2;
-//        cell.CellStyle.SetFont(font);
-
-//        cell.SetCellValue("A very long piece of text that I want to auto-fit innit, yeah. Although if it gets really, really long it'll probably start messing up more.");
-//        sheet1.AutoSizeColumn(0);
-//        rowIndex++;
-
-//        // 新增試算表。
-//        var sheet2 = workbook.CreateSheet("My Sheet");
-//        // 建立儲存格樣式。
-//        var style1 = workbook.CreateCellStyle();
-//        style1.FillForegroundColor = HSSFColor.Blue.Index2;
-//        style1.FillPattern = FillPattern.SolidForeground;
-
-//        var style2 = workbook.CreateCellStyle();
-//        style2.FillForegroundColor = HSSFColor.Yellow.Index2;
-//        style2.FillPattern = FillPattern.SolidForeground;
-
-//        // 設定儲存格樣式與資料。
-//        var cell2 = sheet2.CreateRow(0).CreateCell(0);
-//        cell2.CellStyle = style1;
-//        cell2.SetCellValue(0);
-
-//        cell2 = sheet2.CreateRow(1).CreateCell(0);
-//        cell2.CellStyle = style2;
-//        cell2.SetCellValue(1);
-
-//        cell2 = sheet2.CreateRow(2).CreateCell(0);
-//        cell2.CellStyle = style1;
-//        cell2.SetCellValue(2);
-
-//        cell2 = sheet2.CreateRow(3).CreateCell(0);
-//        cell2.CellStyle = style2;
-//        cell2.SetCellValue(3);
-
-//        cell2 = sheet2.CreateRow(4).CreateCell(0);
-//        cell2.CellStyle = style1;
-//        cell2.SetCellValue(4);
-
-//        workbook.Write(fs);
-//    }
-//    Console.WriteLine("Excel  Done");
-
-//}
-//    }
-//}
-
-
-
-
-
-
