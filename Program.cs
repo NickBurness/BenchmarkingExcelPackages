@@ -35,6 +35,7 @@ namespace BenchmarkingExcelPackages
             #endregion
 
             #region NPOI
+            watch.Reset();
             watch.Start();
 
             var NPOI = new NPOI();
@@ -56,6 +57,7 @@ namespace BenchmarkingExcelPackages
             #endregion
 
             #region ExcelDataReader and ClosedXML Writer
+            watch.Reset();
             watch.Start();
 
             var ExcelDR = new ExcelDataReaderAndClosedXMLWriter();
@@ -77,7 +79,9 @@ namespace BenchmarkingExcelPackages
             #endregion
 
             #region ClosedXML Reader only
+            watch.Reset();
             watch.Start();
+
             var ClosedXML = new ClosedXMLReader();
             WriteLine("ClosedXML Read Data Process Started...");
             ClosedXML.GetDataFromExcel();

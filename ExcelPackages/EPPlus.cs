@@ -197,7 +197,7 @@ namespace BenchmarkingExcelPackages
 
                     FileInfo fileInfo = new FileInfo($@"{actualPath}\ExcelFiles\EPPlusGeneratedFile.xlsx");
                     excelPackage.SaveAs(fileInfo);
-
+                    data.Dispose();
                     return true;
                 }
                 catch (Exception ex)

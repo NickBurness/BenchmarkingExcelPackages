@@ -304,12 +304,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClosedXMLReader.cs" />
-    <Compile Include="EPPlus.cs" />
+    <Compile Include="ExcelPackages\ClosedXMLReader.cs" />
+    <Compile Include="ExcelPackages\EPPlus.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="ExcelDataReaderAndClosedXMLWriter.cs" />
+    <Compile Include="ExcelPackages\ExcelDataReaderAndClosedXMLWriter.cs" />
     <Compile Include="Models\ExcelData.cs" />
-    <Compile Include="NPOI.cs" />
+    <Compile Include="ExcelPackages\NPOI.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
