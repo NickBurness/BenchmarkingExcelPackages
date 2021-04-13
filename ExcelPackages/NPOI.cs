@@ -19,6 +19,7 @@ namespace BenchmarkingExcelPackages
     {
         private IWorkbook workbook;
 
+        [Benchmark]
         public async Task<DataTable> ImportDataAsync()
         {
             var task = Task.Run(() => ImportData());

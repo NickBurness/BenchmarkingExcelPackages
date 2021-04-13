@@ -2,7 +2,10 @@
 using System.Threading.Tasks;
 using System.Diagnostics;
 using static System.Console;
-
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Columns;
 
 namespace BenchmarkingExcelPackages
 {
@@ -10,6 +13,7 @@ namespace BenchmarkingExcelPackages
     {
         static async Task Main()
         {
+#if (Debug)
             string memoryUsage = "";
             WriteLine(memoryUsage.GetLowDetailAboutMemoryUsage());
             var watch = Stopwatch.StartNew();
@@ -78,7 +82,6 @@ namespace BenchmarkingExcelPackages
             WriteLine($"Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
             #endregion
 
-            //?
             #region ClosedXML Reader only
             watch.Reset();
             watch.Start();
@@ -92,12 +95,17 @@ namespace BenchmarkingExcelPackages
             watch.Stop();
             WriteLine($"Read Process Only - Execution Time: {watch.ElapsedMilliseconds} milliseconds or around {watch.Elapsed.TotalSeconds} seconds. \n");
             #endregion
-
-            #region BenchmarkDotNet
-#if (!Debug)
-            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
 #endif
-            #endregion
+
+#if (!Debug)
+            var config = new ManualConfig()
+                .WithOptions(ConfigOptions.DisableOptimizationsValidator)
+                .AddValidator(JitOptimizationsValidator.DontFailOnError)
+                .AddLogger(ConsoleLogger.Default)
+                .AddColumnProvider(DefaultColumnProviders.Instance);
+
+            BenchmarkRunner.Run(typeof(Program).Assembly, config);
+#endif
 
             return;
         }
